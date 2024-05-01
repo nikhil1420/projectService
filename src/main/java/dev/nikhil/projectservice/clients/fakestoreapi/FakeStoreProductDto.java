@@ -1,5 +1,6 @@
-package dev.nikhil.projectservice.dtos;
+package dev.nikhil.projectservice.clients.fakestoreapi;
 
+import dev.nikhil.projectservice.dtos.RatingDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ProductDto {
+public class FakeStoreProductDto {
     private Long id;
     private String title;
     private String description;
