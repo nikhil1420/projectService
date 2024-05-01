@@ -4,6 +4,7 @@ import dev.nikhil.projectservice.dtos.ProductDto;
 import dev.nikhil.projectservice.exceptions.NotFoundException;
 import dev.nikhil.projectservice.models.Category;
 import dev.nikhil.projectservice.models.Product;
+import dev.nikhil.projectservice.repositories.ProductRepository;
 import dev.nikhil.projectservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProductRepository productRepository;
 
     @GetMapping()
     public List<Product> getAllProducts() {
