@@ -1,104 +1,76 @@
 package dev.nikhil.projectservice.controllers;
 
-import dev.nikhil.projectservice.dtos.ProductDto;
-import dev.nikhil.projectservice.exceptions.NotFoundException;
-import dev.nikhil.projectservice.models.Category;
+import dev.nikhil.projectservice.dto.CreateProductRequestDTO;
+import dev.nikhil.projectservice.dto.ProductResponseDTO;
+import dev.nikhil.projectservice.dto.fakeStoreDTOs.FakeStoreProductResponseDTO;
+import dev.nikhil.projectservice.exceptions.InvalidInputException;
+import dev.nikhil.projectservice.exceptions.RandomException;
 import dev.nikhil.projectservice.models.Product;
-import dev.nikhil.projectservice.repositories.ProductRepository;
 import dev.nikhil.projectservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService; // field injection
 
-    @GetMapping()
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
+        List<ProductResponseDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<Product> getSingleProduct(@PathVariable("productId") Long productId) throws NotFoundException {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-
-        headers.add(
-                "auth-token", "noaccess4uheyhey"
-        );
-
-        Optional<Product> productOptional = productService.getSingleProduct(productId);
-
-        if (productOptional.isEmpty()) {
-            throw new NotFoundException("No Product with product id: " + productId);
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") UUID id){
+        if(id == null){
+            throw new InvalidInputException("Input is not correct");
         }
+        return ResponseEntity.ok(productService.getProduct(id));
+    }
 
-        ResponseEntity<Product> response = new ResponseEntity(
-                productService.getSingleProduct(productId),
-                headers,
-                HttpStatus.NOT_FOUND
+    @PostMapping
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody CreateProductRequestDTO productRequestDTO){
+        return ResponseEntity.ok(productService.createProduct(productRequestDTO));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") UUID id, @RequestBody CreateProductRequestDTO productRequestDTO){
+        return ResponseEntity.ok(productService.updateProduct(productRequestDTO, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteProduct(@PathVariable("id") UUID id){
+        return ResponseEntity.ok(
+                productService.deleteProduct(id)
         );
-
-        return response;
     }
 
-
-    @PostMapping()
-    public ResponseEntity<Product> addNewProduct(@RequestBody ProductDto product) {
-
-        Product newProduct = productService.addNewProduct(
-                product
+    @GetMapping("/name/{productName}")
+    public ResponseEntity<ProductResponseDTO> getProductByProductName(@PathVariable("productName") String productName){
+        return ResponseEntity.ok(
+                productService.getProduct(productName)
         );
-
-        ResponseEntity<Product> response = new ResponseEntity<>(newProduct, HttpStatus.OK);
-
-        return response;
     }
 
-    @PatchMapping("/{productId}")
-    public Product updateProduct(@PathVariable("productId") Long productId,
-                                 @RequestBody ProductDto productDto) {
-        Product product = new Product();
-        product.setId(productDto.getId());
-        product.setCategory(new Category());
-        product.getCategory().setName(productDto.getCategory());
-        product.setTitle(productDto.getTitle());
-        product.setPrice(productDto.getPrice());
-        product.setDescription(productDto.getDescription());
-
-        return productService.updateProduct(productId, product);
-    }
-
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<Product> deleteProduct(@PathVariable("productId") Long productId) throws NotFoundException {
-        Optional<Product> productOptional = productService.deleteProduct(productId);
-        if (productOptional.isEmpty()) {
-            throw new NotFoundException("No Product with product id: " + productId);
-        }
-
-        ResponseEntity<Product> response = new ResponseEntity(
-                productService.getSingleProduct(productId),
-                HttpStatus.OK
+    @GetMapping("/{min}/{max}")
+    public ResponseEntity getProductByPriceRange(@PathVariable("min") double minPrice, @PathVariable("max") double maxPrice){
+        return ResponseEntity.ok(
+                productService.getProducts(minPrice, maxPrice)
         );
-
-        return response;
     }
 
-//    @ExceptionHandler(NotFoundException.class)
-//    public ResponseEntity<ErrorResponseDto> naman(Exception exception) {
-//        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
-//        errorResponseDto.setErrorMessage(exception.getMessage());
-//
-//        return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
-//    }
+
+    //used for demo of controller advice
+    /*
+    @GetMapping("/productexception")
+    public ResponseEntity getProductException(){
+        throw new RandomException("Exception from product");
+    }
+     */
 }

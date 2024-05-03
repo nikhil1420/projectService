@@ -6,8 +6,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,8 +19,9 @@ import java.util.Date;
 public class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private Date createdAt;
-    private Date lastUpdatedAt;
-    private boolean isDeleted;
+    private UUID id;
+    @CreationTimestamp
+    private Instant createdAt;  // number of seconds/nanoseconds since 1 Jan, 1970 UTC
+    @UpdateTimestamp
+    private Instant updatedAt;
 }

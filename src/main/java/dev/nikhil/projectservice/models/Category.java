@@ -1,7 +1,6 @@
 package dev.nikhil.projectservice.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +16,6 @@ public class Category extends BaseModel {
     // 1 : m
     // 1 : 1
     // 1 : m
-    @OneToMany(mappedBy = "category")
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Product> products;
 }

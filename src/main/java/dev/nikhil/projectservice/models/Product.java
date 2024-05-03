@@ -1,5 +1,6 @@
 package dev.nikhil.projectservice.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
@@ -24,4 +25,5 @@ public class Product extends BaseModel {
     @ManyToOne
     private Category category;
     private String imageUrl;
+    private double rating;
 }

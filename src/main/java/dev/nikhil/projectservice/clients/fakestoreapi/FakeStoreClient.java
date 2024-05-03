@@ -1,7 +1,6 @@
 package dev.nikhil.projectservice.clients.fakestoreapi;
 
-import dev.nikhil.projectservice.dtos.ProductDto;
-import dev.nikhil.projectservice.exceptions.NotFoundException;
+import dev.nikhil.projectservice.dto.fakeStoreDTOs.FakeStoreProductResponseDTO;
 import dev.nikhil.projectservice.models.Product;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
@@ -39,32 +38,32 @@ public class FakeStoreClient {
     }
 
 
-    public List<FakeStoreProductDto> getAllProducts() {
+    public List<FakeStoreProductResponseDTO> getAllProducts() {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
-        ResponseEntity<FakeStoreProductDto[]> l = restTemplate.getForEntity(
+        ResponseEntity<FakeStoreProductResponseDTO[]> l = restTemplate.getForEntity(
                 "https://fakestoreapi.com/products",
-                FakeStoreProductDto[].class
+                FakeStoreProductResponseDTO[].class
         );
 
         return Arrays.asList(l.getBody());
     }
 
-    public Optional<FakeStoreProductDto> getSingleProduct(Long productId) throws NotFoundException {
+    public FakeStoreProductResponseDTO getProductById(int productId)  {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto> response =  restTemplate.getForEntity(
+        ResponseEntity<FakeStoreProductResponseDTO> response =  restTemplate.getForEntity(
                 "https://fakestoreapi.com/products/{id}",
-                FakeStoreProductDto.class, productId);
-        FakeStoreProductDto productDto = response.getBody();
-        return Optional.of(productDto);
+                FakeStoreProductResponseDTO.class, productId);
+        FakeStoreProductResponseDTO productDto = response.getBody();
+        return productDto;
     }
 
-   public FakeStoreProductDto addNewProduct(ProductDto product) {
+   public Product addNewProduct(Product product) {
         RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto> response = restTemplate.postForEntity(
+        ResponseEntity<Product> response = restTemplate.postForEntity(
                 "https://fakestoreapi.com/products",
                 product,
-                FakeStoreProductDto.class
+                Product.class
         );
         return response.getBody();
     }
@@ -73,39 +72,21 @@ public class FakeStoreClient {
     Product object has only those fields filled which need to be updated.
     Everything else is null
      */
-    public FakeStoreProductDto updateProduct(Long productId, FakeStoreProductDto fakeStoreProductDto) {
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = requestForEntity(
+    public Product updateProduct(Product updatedProduct, Long productId) {
+        ResponseEntity<Product> fakeStoreProductDtoResponseEntity = requestForEntity(
                 HttpMethod.PATCH,
                 "https://fakestoreapi.com/products/{id}",
-                fakeStoreProductDto,
-                FakeStoreProductDto.class,
+                updatedProduct,
+                Product.class,
                 productId
         );
 
         return fakeStoreProductDtoResponseEntity.getBody();
     }
 
-    public FakeStoreProductDto replaceProduct(Long productId, FakeStoreProductDto fakeStoreProductDto) {
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = requestForEntity(
-                HttpMethod.PUT,
-                "https://fakestoreapi.com/products/{id}",
-                fakeStoreProductDto,
-                FakeStoreProductDto.class,
-                productId
-        );
-
-        return fakeStoreProductDtoResponseEntity.getBody();
-    }
-    public FakeStoreProductDto deleteProduct(Long productId, FakeStoreProductDto fakeStoreProductDto) {
-        ResponseEntity<FakeStoreProductDto> fakeStoreProductDtoResponseEntity = requestForEntity(
-                HttpMethod.DELETE,
-                "https://fakestoreapi.com/products/{id}",
-                fakeStoreProductDto,
-                FakeStoreProductDto.class,
-                productId
-        );
-
-        return fakeStoreProductDtoResponseEntity.getBody();
+    public boolean deleteProduct(long productId) {
+       restTemplateBuilder.build().delete("https://fakestoreapi.com/products/{productId}", productId);
+       return true;
     }
 
     public List<String> getAllCategories(){

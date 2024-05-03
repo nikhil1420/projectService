@@ -7,17 +7,15 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 
 @Controller
-public class FakeStoreCategoryServiceImpl implements CategoryService {
+public class FakeStoreCategoryServiceImpl {
     @Autowired
     private FakeStoreClient fakeStoreClient;
 
-    @Override
     public List<String> getAllCategories() {
         List<String> categories = fakeStoreClient.getAllCategories();
         return categories;
     }
 
-    @Override
     public String getProductsInCategory(Long categoryId) {
         return null;
     }

@@ -1,11 +1,16 @@
 package dev.nikhil.projectservice.services;
 
-import dev.nikhil.projectservice.models.Category;
+
+import dev.nikhil.projectservice.dto.CategoryResponseDTO;
+import dev.nikhil.projectservice.dto.CreateCategoryRequestDTO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CategoryService {
-   List<String> getAllCategories();
-
-    String getProductsInCategory(Long categoryId);
+    CategoryResponseDTO getCategory(UUID categoryId);
+    List<CategoryResponseDTO> getAllCategories();
+    CategoryResponseDTO createCategory(CreateCategoryRequestDTO categoryRequestDTO);
+    CategoryResponseDTO updateCategory(CreateCategoryRequestDTO categoryRequestDTO, UUID categoryId);
+    boolean deleteCategory(UUID categoryId);
 }
