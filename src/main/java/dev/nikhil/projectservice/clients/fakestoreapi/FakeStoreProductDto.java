@@ -1,6 +1,6 @@
 package dev.nikhil.projectservice.clients.fakestoreapi;
 
-import dev.nikhil.projectservice.dtos.RatingDto;
+import dev.nikhil.projectservice.dto.fakeStoreDTOs.FakeStoreProductRatingDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,5 +15,5 @@ public class FakeStoreProductDto {
     private double price;
     private String image;
     private String category;
-    private RatingDto rating;
+    private FakeStoreProductRatingDTO rating;
 }

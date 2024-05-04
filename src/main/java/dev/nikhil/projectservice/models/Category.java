@@ -11,7 +11,6 @@ import java.util.List;
 @Entity
 public class Category extends BaseModel {
     private String name;
-    private String description;
     // C : P
     // 1 : m
     // 1 : 1

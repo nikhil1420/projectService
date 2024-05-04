@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO createProduct(CreateProductRequestDTO productRequestDTO) {
         Product product = ProductEntityDTOMapper.convertCreateProductRequestDTOToProduct(productRequestDTO);
-        Category savedCategory = categoryRepository.findById(productRequestDTO.getCategoryId()).orElseThrow(
+            Category savedCategory = categoryRepository.findById(productRequestDTO.getCategoryId()).orElseThrow(
                 () -> new CategoryNotFoundException("Category not found for id : " + productRequestDTO.getCategoryId()));
         product.setCategory(savedCategory);
         product = productRepository.save(product);
