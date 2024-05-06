@@ -1,14 +1,21 @@
 package dev.nikhil.projectservice.controllers;
 
+import dev.nikhil.projectservice.clients.authenticationclient.AuthenticationClient;
+import dev.nikhil.projectservice.clients.authenticationclient.dto.Role;
+import dev.nikhil.projectservice.clients.authenticationclient.dto.SessionStatus;
+import dev.nikhil.projectservice.clients.authenticationclient.dto.ValidateTokenResponseDto;
 import dev.nikhil.projectservice.dto.CreateProductRequestDTO;
 import dev.nikhil.projectservice.dto.ProductResponseDTO;
+import dev.nikhil.projectservice.dto.ValidateTokenRequestDto;
 import dev.nikhil.projectservice.dto.fakeStoreDTOs.FakeStoreProductResponseDTO;
 import dev.nikhil.projectservice.exceptions.InvalidInputException;
 import dev.nikhil.projectservice.exceptions.RandomException;
 import dev.nikhil.projectservice.models.Product;
 import dev.nikhil.projectservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +26,41 @@ import java.util.UUID;
 public class ProductController {
     @Autowired
     private ProductService productService; // field injection
+    @Autowired
+    private AuthenticationClient authenticationClient;
 
+    //Make only admins able to access all products
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts(@Nullable @RequestHeader("AUTH_TOKEN") String token,
+                                                                   @Nullable @RequestHeader("USER_ID") UUID userId){
+        // check if token exists
+        if (token == null || userId == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        ValidateTokenResponseDto response = authenticationClient.validate(token, userId);
+
+        // check if token is valid
+        if (response.getSessionStatus().equals(SessionStatus.INVALID)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // check if user has permissions
+        boolean isUserAdmin = false;
+        for (Role role: response.getUser().getRoles()) {
+            if (role.getRole().equals("ADMIN")) {
+                isUserAdmin = true;
+            }
+        }
+
+        if (!isUserAdmin) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         List<ProductResponseDTO> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+
+//        products.get(0).setPrice(100); /// Bug induced in my code
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
